@@ -18,15 +18,15 @@
     }
 
     .wrapper {
-      max-width: 820px;
+      max-width: 860px;
       margin: 36px auto;
       padding: 18px;
     }
 
     .card {
       background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 14px 36px rgba(55, 84, 62, 0.12);
+      border-radius: 22px;
+      box-shadow: 0 16px 40px rgba(55, 84, 62, 0.12);
       overflow: hidden;
       border: 1px solid #e7efe8;
     }
@@ -34,19 +34,19 @@
     .header {
       background: linear-gradient(135deg, #2f7d4a 0%, #ee8b2d 100%);
       color: #ffffff;
-      padding: 28px 30px 24px;
+      padding: 30px 32px 26px;
     }
 
     .badge {
       display: inline-block;
-      padding: 3px 9px;
+      padding: 4px 10px;
       border-radius: 999px;
       font-size: 12px;
       font-weight: 700;
       background: rgba(255,255,255,0.18);
       color: #ffffff;
       border: 1px solid rgba(255,255,255,0.28);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .header h1 {
@@ -59,27 +59,60 @@
     .subtitle {
       margin-top: 8px;
       font-size: 14px;
-      line-height: 1.6;
-      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.7;
+      color: rgba(255,255,255,0.96);
     }
 
     .content {
-      padding: 28px 30px 30px;
+      padding: 28px 32px 32px;
     }
 
-    .login-area {
-      margin-bottom: 22px;
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #243127;
+    }
+
+    .section-note {
+      font-size: 13px;
+      color: #6f7f73;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .login-panel,
+    .account-panel,
+    .form-card,
+    .result-card {
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .login-panel {
+      background: #fcfcfb;
+      border: 1px solid #ecefe9;
+    }
+
+    .account-panel {
+      background: #f7faf7;
+      border: 1px solid #e2ebe3;
+      display: none;
+    }
+
+    .account-line {
+      font-size: 14px;
+      color: #425146;
+      line-height: 1.7;
     }
 
     .status-box {
       padding: 14px 16px;
       border-radius: 12px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
       font-size: 14px;
       line-height: 1.6;
-      background: #eef8f1;
-      border: 1px solid #cfe7d5;
-      color: #1f5a34;
       display: none;
     }
 
@@ -101,8 +134,38 @@
       color: #1f5a34;
     }
 
+    .form-card {
+      display: none;
+      background: #fcfcfb;
+      border: 1px solid #ecefe9;
+    }
+
+    .form-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #243127;
+    }
+
+    .form-subtitle {
+      font-size: 13px;
+      color: #708074;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field-grid .full {
+      grid-column: 1 / -1;
+    }
+
     .field {
-      margin-bottom: 18px;
+      margin-bottom: 2px;
     }
 
     label {
@@ -145,29 +208,6 @@
       line-height: 1.5;
     }
 
-    .form-card {
-      display: none;
-      margin-top: 22px;
-      padding: 22px;
-      border-radius: 16px;
-      background: #fcfcfb;
-      border: 1px solid #ecefe9;
-    }
-
-    .form-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #243127;
-    }
-
-    .form-subtitle {
-      font-size: 13px;
-      color: #708074;
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
-
     .button-row {
       display: flex;
       gap: 12px;
@@ -207,6 +247,7 @@
       background: #fff4e8;
       color: #a85d12;
       border: 1px solid #ffd4a6;
+      display: none;
     }
 
     .secondary-btn:hover {
@@ -214,9 +255,6 @@
     }
 
     .result-card {
-      margin-top: 24px;
-      padding: 20px;
-      border-radius: 16px;
       display: none;
     }
 
@@ -252,7 +290,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .number-item {
@@ -268,7 +306,7 @@
     }
 
     .footer-note {
-      margin-top: 20px;
+      margin-top: 8px;
       padding-top: 16px;
       border-top: 1px solid #edf1ee;
       font-size: 12px;
@@ -276,7 +314,11 @@
       line-height: 1.7;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 700px) {
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+
       .wrapper {
         margin: 18px auto;
         padding: 10px;
@@ -298,7 +340,7 @@
   <div class="wrapper">
     <div class="card">
       <div class="header">
-        <div class="badge">Member Number Assignment</div>
+        <div class="badge">Member ID System</div>
         <h1>會員號碼申請系統</h1>
         <div class="subtitle">
           請使用已授權的 Google 帳戶登入，然後提交會員號碼申請。<br>
@@ -307,7 +349,13 @@
       </div>
 
       <div class="content">
-        <div class="login-area">
+        <div class="login-panel">
+          <div class="section-title">登入 / Sign In</div>
+          <div class="section-note">
+            請先使用 Google 帳戶登入，系統會自動檢查是否已獲授權。<br>
+            Please sign in with your Google account first. The system will automatically verify your access.
+          </div>
+
           <div id="g_id_onload"
                data-client_id="663272088961-8khaah34cj9bsvesuing05a84djeorh0.apps.googleusercontent.com"
                data-callback="handleCredentialResponse">
@@ -323,6 +371,10 @@
           </div>
         </div>
 
+        <div id="accountPanel" class="account-panel">
+          <div class="account-line" id="accountInfo"></div>
+        </div>
+
         <div id="statusBox" class="status-box"></div>
         <div id="result" class="result-card"></div>
 
@@ -333,36 +385,39 @@
             Please complete the details below to obtain new member number(s).
           </div>
 
-          <div class="field">
-            <label for="center">
-              <div class="label-cn">報單中心編號</div>
-              <div class="label-en">Center Code</div>
-            </label>
-            <input type="text" id="center" placeholder="例如 / e.g. FN001">
-          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="center">
+                <div class="label-cn">報單中心編號</div>
+                <div class="label-en">Center Code</div>
+              </label>
+              <input type="text" id="center" placeholder="例如 / e.g. FN001">
+            </div>
 
-          <div class="field">
-            <label for="personName">
-              <div class="label-cn">負責人姓名</div>
-              <div class="label-en">Person in Charge</div>
-            </label>
-            <input type="text" id="personName" placeholder="請輸入姓名 / Enter name">
-          </div>
+            <div class="field">
+              <label for="qty">
+                <div class="label-cn">申請數量</div>
+                <div class="label-en">Quantity Requested</div>
+              </label>
+              <input type="number" id="qty" min="1" max="20" value="1">
+              <div class="hint">
+                每次最多可申請 20 個會員號碼。<br>
+                Maximum 20 member numbers per request.
+              </div>
+            </div>
 
-          <div class="field">
-            <label for="qty">
-              <div class="label-cn">申請數量</div>
-              <div class="label-en">Quantity Requested</div>
-            </label>
-            <input type="number" id="qty" min="1" max="20" value="1">
-            <div class="hint">
-              每次最多可申請 20 個會員號碼。<br>
-              Maximum 20 member numbers per request.
+            <div class="field full">
+              <label for="personName">
+                <div class="label-cn">負責人姓名</div>
+                <div class="label-en">Person in Charge</div>
+              </label>
+              <input type="text" id="personName" placeholder="請輸入姓名 / Enter name">
             </div>
           </div>
 
           <div class="button-row">
             <button id="submitBtn" class="primary-btn" onclick="submitRequest()">提交申請 / Submit</button>
+            <button id="copyBtn" class="secondary-btn" onclick="copyNumbers()">複製號碼 / Copy Numbers</button>
           </div>
         </div>
 
@@ -378,6 +433,7 @@
     const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwsQq96WMhIV3Kh0nXMBZmugD51SOn5N0aUfc1KjKQ_E8SkalbR7ZRTBm1sS8rCV58zWw/exec';
 
     let signedInEmail = '';
+    let latestAssignedNumbers = [];
 
     function showStatus(message, type) {
       const box = document.getElementById('statusBox');
@@ -391,7 +447,7 @@
       box.innerHTML = message;
     }
 
-    function showResult(title, message, type, numbers = [], qty = '') {
+    function showResult(title, message, type, numbers = []) {
       const resultDiv = document.getElementById('result');
       resultDiv.style.display = 'block';
       resultDiv.className = 'result-card';
@@ -432,6 +488,10 @@
         const email = (userObject.email || '').toLowerCase();
         signedInEmail = email;
 
+        document.getElementById('accountPanel').style.display = 'block';
+        document.getElementById('accountInfo').innerHTML =
+          '已登入帳戶 / Signed-in Account：<strong>' + email + '</strong>';
+
         showStatus(
           '正在驗證登入帳戶：<strong>' + email + '</strong><br>' +
           'Verifying signed-in account: <strong>' + email + '</strong>',
@@ -468,8 +528,8 @@
 
         if (res.success && res.approved) {
           showStatus(
-            '已識別登入帳戶：<strong>' + res.email + '</strong><br>' +
-            'Signed-in account detected and approved.',
+            '已識別並驗證登入帳戶：<strong>' + res.email + '</strong><br>' +
+            'Signed-in account verified and approved.',
             'success'
           );
 
@@ -527,6 +587,10 @@
       const personName = document.getElementById('personName').value.trim();
       const qty = document.getElementById('qty').value;
       const submitBtn = document.getElementById('submitBtn');
+      const copyBtn = document.getElementById('copyBtn');
+
+      latestAssignedNumbers = [];
+      copyBtn.style.display = 'none';
 
       if (!signedInEmail) {
         showResult(
@@ -568,14 +632,19 @@
 
       window[callbackName] = function(res) {
         if (res.success) {
+          latestAssignedNumbers = res.numbers || [];
+
           showResult(
             '申請成功 / Request Successful',
             '使用帳戶 / Account Used：<strong>' + signedInEmail + '</strong><br>' +
             '成功分配數量 / Quantity Assigned：<strong>' + res.qty + '</strong>',
             'success',
-            res.numbers,
-            res.qty
+            latestAssignedNumbers
           );
+
+          if (latestAssignedNumbers.length > 0) {
+            copyBtn.style.display = 'inline-block';
+          }
         } else {
           showResult(
             '申請未能完成 / Request Not Completed',
@@ -611,6 +680,20 @@
       };
 
       document.body.appendChild(script);
+    }
+
+    function copyNumbers() {
+      if (!latestAssignedNumbers.length) return;
+
+      const text = latestAssignedNumbers.join(', ');
+      navigator.clipboard.writeText(text).then(function() {
+        const btn = document.getElementById('copyBtn');
+        const originalText = btn.textContent;
+        btn.textContent = '已複製 / Copied';
+        setTimeout(function() {
+          btn.textContent = originalText;
+        }, 1500);
+      });
     }
   </script>
 </body>
