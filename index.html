@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <title>Google Login Approval Test</title>
+  <title>Member Number Request</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,12 +14,16 @@
     }
 
     .card {
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
       background: #fff;
       border-radius: 14px;
       padding: 28px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
     }
 
     .result {
@@ -29,6 +33,7 @@
       background: #eef8f1;
       border: 1px solid #cfe7d5;
       display: none;
+      line-height: 1.6;
     }
 
     .error {
@@ -40,13 +45,61 @@
       background: #fff8ef;
       border: 1px solid #ffdcb8;
     }
+
+    .field {
+      margin-top: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 18px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #2f7d4a;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #25643b;
+    }
+
+    #formArea {
+      display: none;
+      margin-top: 24px;
+      padding: 18px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .numbers {
+      margin-top: 12px;
+      padding-left: 18px;
+    }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Google Login Approval Test</h1>
-    <p>Phase 2: sign in and check if the Gmail is approved.</p>
+    <h1>Member Number Request</h1>
+    <p>Sign in with Google. Approved users can request member numbers.</p>
 
+    <!-- Google Sign-In -->
     <div id="g_id_onload"
          data-client_id="663272088961-8khaah34cj9bsvesuing05a84djeorh0.apps.googleusercontent.com"
          data-callback="handleCredentialResponse">
@@ -61,11 +114,36 @@
          data-logo_alignment="left">
     </div>
 
+    <!-- Result box -->
     <div id="result" class="result"></div>
+
+    <!-- Hidden form area -->
+    <div id="formArea">
+      <h3>Request Form</h3>
+
+      <div class="field">
+        <label for="center">報單中心編號 / Center Code</label>
+        <input type="text" id="center" placeholder="例如 C001">
+      </div>
+
+      <div class="field">
+        <label for="personName">負責人姓名 / Person in Charge</label>
+        <input type="text" id="personName" placeholder="請輸入姓名">
+      </div>
+
+      <div class="field">
+        <label for="qty">申請數量 / Quantity</label>
+        <input type="number" id="qty" min="1" value="1">
+      </div>
+
+      <button id="submitBtn" onclick="submitRequest()">提交申請 / Submit</button>
+    </div>
   </div>
 
   <script>
-    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzFmNcCZWFENkNo9dZ4d1qihYIl8E_rTOz3M8muPS7PqruI3CLgyxbsv7tiL_IYMgSk3A/exec';
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwHdexm-i9NxaDKMWOp9Mdvw1CX9erjnNIYtfRV0OvhjdcGQ20vgGEgRFgUhqM7v4NcDw/exec';
+
+    let signedInEmail = '';
 
     function decodeJwtResponse(token) {
       const base64Url = token.split('.')[1];
@@ -84,6 +162,7 @@
       try {
         const userObject = decodeJwtResponse(response.credential);
         const email = (userObject.email || '').toLowerCase();
+        signedInEmail = email;
 
         resultDiv.style.display = 'block';
         resultDiv.className = 'result loading';
@@ -95,7 +174,8 @@
       } catch (e) {
         resultDiv.style.display = 'block';
         resultDiv.className = 'result error';
-        resultDiv.innerHTML = '<strong>Error</strong><br>' + e.message;
+        resultDiv.innerHTML =
+          '<strong>Error decoding login response</strong><br>' + e.message;
       }
     }
 
@@ -104,6 +184,7 @@
 
       window[callbackName] = function(res) {
         const resultDiv = document.getElementById('result');
+        const formArea = document.getElementById('formArea');
 
         if (res.success && res.approved) {
           resultDiv.className = 'result';
@@ -111,12 +192,16 @@
             '<strong>Access granted</strong><br>' +
             'Email: ' + res.email + '<br>' +
             'Status: Approved';
+
+          formArea.style.display = 'block';
         } else {
           resultDiv.className = 'result error';
           resultDiv.innerHTML =
             '<strong>Access denied</strong><br>' +
             'Email: ' + (res.email || email) + '<br>' +
             'Status: ' + (res.message || 'Not authorized');
+
+          formArea.style.display = 'none';
         }
 
         delete window[callbackName];
@@ -134,6 +219,93 @@
         resultDiv.className = 'result error';
         resultDiv.innerHTML =
           '<strong>Error</strong><br>Unable to connect to backend.';
+      };
+
+      document.body.appendChild(script);
+    }
+
+    function submitRequest() {
+      const resultDiv = document.getElementById('result');
+      const center = document.getElementById('center').value.trim();
+      const personName = document.getElementById('personName').value.trim();
+      const qty = document.getElementById('qty').value;
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (!signedInEmail) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '<strong>Error</strong><br>No signed-in email found.';
+        return;
+      }
+
+      if (!center) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '<strong>Error</strong><br>Please enter Center Code.';
+        return;
+      }
+
+      if (!personName) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '<strong>Error</strong><br>Please enter Person in Charge.';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result loading';
+      resultDiv.innerHTML =
+        '<strong>Processing request...</strong><br>Please wait.';
+
+      const callbackName = 'assignCallback_' + Date.now();
+
+      window[callbackName] = function(res) {
+        if (res.success) {
+          let html =
+            '<strong>Assigned successfully</strong><br>' +
+            'Email: ' + signedInEmail + '<br>' +
+            'Quantity: ' + res.qty + '<br>' +
+            '<div class="numbers"><strong>Member Numbers:</strong><ul>';
+
+          res.numbers.forEach(function(no) {
+            html += '<li>' + no + '</li>';
+          });
+
+          html += '</ul></div>';
+
+          resultDiv.className = 'result';
+          resultDiv.innerHTML = html;
+        } else {
+          resultDiv.className = 'result error';
+          resultDiv.innerHTML =
+            '<strong>Error</strong><br>' + res.message;
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = '提交申請 / Submit';
+
+        delete window[callbackName];
+        script.remove();
+      };
+
+      const script = document.createElement('script');
+      script.src = BACKEND_URL
+        + '?action=assign'
+        + '&email=' + encodeURIComponent(signedInEmail)
+        + '&center=' + encodeURIComponent(center)
+        + '&name=' + encodeURIComponent(personName)
+        + '&qty=' + encodeURIComponent(qty)
+        + '&callback=' + callbackName;
+
+      script.onerror = function() {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML =
+          '<strong>Error</strong><br>Unable to connect to backend.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = '提交申請 / Submit';
       };
 
       document.body.appendChild(script);
