@@ -86,18 +86,20 @@
     .form-card,
     .result-card {
       border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 20px;
     }
 
     .login-panel {
       background: #fcfcfb;
       border: 1px solid #ecefe9;
+      padding: 18px;
+      margin-bottom: 20px;
     }
 
     .account-panel {
       background: #f7faf7;
       border: 1px solid #e2ebe3;
+      padding: 18px;
+      margin-bottom: 20px;
       display: none;
     }
 
@@ -138,6 +140,8 @@
       display: none;
       background: #fcfcfb;
       border: 1px solid #ecefe9;
+      padding: 22px;
+      margin-bottom: 0;
     }
 
     .form-title {
@@ -256,6 +260,8 @@
 
     .result-card {
       display: none;
+      margin-top: 14px;
+      padding: 20px;
     }
 
     .result-success {
@@ -376,7 +382,6 @@
         </div>
 
         <div id="statusBox" class="status-box"></div>
-        <div id="result" class="result-card"></div>
 
         <div id="formArea" class="form-card">
           <div class="form-title">申請資料 / Request Details</div>
@@ -419,6 +424,8 @@
             <button id="submitBtn" class="primary-btn" onclick="submitRequest()">提交申請 / Submit</button>
             <button id="copyBtn" class="secondary-btn" onclick="copyNumbers()">複製號碼 / Copy Numbers</button>
           </div>
+
+          <div id="result" class="result-card"></div>
         </div>
 
         <div class="footer-note">
@@ -498,12 +505,6 @@
           'loading'
         );
 
-        showResult(
-          '系統處理中 / Processing',
-          '正在檢查你的帳戶是否已獲授權。<br>Checking whether your account is authorized.',
-          'loading'
-        );
-
         checkApproval(email);
 
       } catch (e) {
@@ -512,6 +513,7 @@
           'error'
         );
 
+        document.getElementById('formArea').style.display = 'none';
         showResult(
           '系統發生錯誤 / Error',
           e.message,
@@ -533,23 +535,12 @@
             'success'
           );
 
-          showResult(
-            '已獲授權 / Access Granted',
-            '你可以提交會員號碼申請。<br>You may now submit your member number request.',
-            'success'
-          );
-
           formArea.style.display = 'block';
+          document.getElementById('result').style.display = 'none';
         } else {
           showStatus(
             '此 Google 帳戶未獲授權：<strong>' + (res.email || email) + '</strong><br>' +
             'This Google account is not authorized.',
-            'error'
-          );
-
-          showResult(
-            '未獲授權 / Access Denied',
-            '此帳戶未被列入核准名單，請聯絡管理員。<br>This account is not on the approved user list. Please contact the administrator.',
             'error'
           );
 
@@ -572,11 +563,7 @@
           'error'
         );
 
-        showResult(
-          '連線錯誤 / Connection Error',
-          '未能連接後端系統，請稍後再試。<br>Unable to connect to backend. Please try again later.',
-          'error'
-        );
+        document.getElementById('formArea').style.display = 'none';
       };
 
       document.body.appendChild(script);
@@ -655,6 +642,7 @@
 
         submitBtn.disabled = false;
         submitBtn.textContent = '提交申請 / Submit';
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         delete window[callbackName];
         script.remove();
