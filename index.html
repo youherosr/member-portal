@@ -4,139 +4,373 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <title>Member Number Request</title>
+  <title>會員號碼申請系統 | Member Number Request</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
       margin: 0;
-      padding: 40px 20px;
+      font-family: Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: linear-gradient(135deg, #f6faf7 0%, #fff8f1 100%);
+      color: #243127;
+    }
+
+    .wrapper {
+      max-width: 820px;
+      margin: 36px auto;
+      padding: 18px;
     }
 
     .card {
-      max-width: 720px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 14px;
-      padding: 28px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 14px 36px rgba(55, 84, 62, 0.12);
+      overflow: hidden;
+      border: 1px solid #e7efe8;
     }
 
-    h1 {
-      margin-top: 0;
+    .header {
+      background: linear-gradient(135deg, #2f7d4a 0%, #ee8b2d 100%);
+      color: #ffffff;
+      padding: 28px 30px 24px;
     }
 
-    .result {
-      margin-top: 20px;
-      padding: 14px;
-      border-radius: 10px;
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.18);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.28);
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .content {
+      padding: 28px 30px 30px;
+    }
+
+    .login-area {
+      margin-bottom: 22px;
+    }
+
+    .status-box {
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+      font-size: 14px;
+      line-height: 1.6;
       background: #eef8f1;
       border: 1px solid #cfe7d5;
+      color: #1f5a34;
       display: none;
-      line-height: 1.6;
     }
 
-    .error {
-      background: #fff4f1;
-      border: 1px solid #ffd2c8;
-    }
-
-    .loading {
+    .status-loading {
       background: #fff8ef;
       border: 1px solid #ffdcb8;
+      color: #8a5a18;
+    }
+
+    .status-error {
+      background: #fff4f1;
+      border: 1px solid #ffd2c8;
+      color: #9b2f1f;
+    }
+
+    .status-success {
+      background: #eef8f1;
+      border: 1px solid #cfe7d5;
+      color: #1f5a34;
     }
 
     .field {
-      margin-top: 14px;
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .label-cn {
+      font-size: 15px;
+      font-weight: 700;
+      color: #243127;
+    }
+
+    .label-en {
+      font-size: 12px;
+      color: #708074;
+      margin-top: 2px;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      padding: 13px 14px;
+      border: 1px solid #d7dfd8;
+      border-radius: 12px;
+      font-size: 15px;
+      background: #ffffff;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      border-color: #2f7d4a;
+      box-shadow: 0 0 0 4px rgba(47, 125, 74, 0.12);
+    }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #7a867d;
+      line-height: 1.5;
+    }
+
+    .form-card {
+      display: none;
+      margin-top: 22px;
+      padding: 22px;
+      border-radius: 16px;
+      background: #fcfcfb;
+      border: 1px solid #ecefe9;
+    }
+
+    .form-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #243127;
+    }
+
+    .form-subtitle {
+      font-size: 13px;
+      color: #708074;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
     }
 
     button {
-      margin-top: 18px;
-      padding: 10px 16px;
       border: none;
-      border-radius: 8px;
-      background: #2f7d4a;
-      color: white;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 14px;
+      transition: all 0.2s ease;
     }
 
-    button:hover {
-      background: #25643b;
+    .primary-btn {
+      background: linear-gradient(135deg, #2f7d4a 0%, #3d9b5f 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(47, 125, 74, 0.18);
     }
 
-    #formArea {
-      display: none;
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(47, 125, 74, 0.22);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .secondary-btn {
+      background: #fff4e8;
+      color: #a85d12;
+      border: 1px solid #ffd4a6;
+    }
+
+    .secondary-btn:hover {
+      background: #ffedd7;
+    }
+
+    .result-card {
       margin-top: 24px;
-      padding: 18px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      background: #fafafa;
+      padding: 20px;
+      border-radius: 16px;
+      display: none;
     }
 
-    .numbers {
-      margin-top: 12px;
-      padding-left: 18px;
+    .result-success {
+      background: #eef9f1;
+      border: 1px solid #cfe7d5;
+    }
+
+    .result-error {
+      background: #fff4f1;
+      border: 1px solid #ffd2c8;
+    }
+
+    .result-loading {
+      background: #fff8ef;
+      border: 1px solid #ffdcb8;
+    }
+
+    .result-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .result-meta {
+      font-size: 14px;
+      color: #425146;
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+
+    .number-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .number-item {
+      background: #ffffff;
+      border: 1px solid #d7ebdc;
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      font-weight: 700;
+      color: #215e38;
+      letter-spacing: 0.5px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #edf1ee;
+      font-size: 12px;
+      color: #7a867d;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 640px) {
+      .wrapper {
+        margin: 18px auto;
+        padding: 10px;
+      }
+
+      .header,
+      .content {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Member Number Request</h1>
-    <p>Sign in with Google. Approved users can request member numbers.</p>
-
-    <!-- Google Sign-In -->
-    <div id="g_id_onload"
-         data-client_id="663272088961-8khaah34cj9bsvesuing05a84djeorh0.apps.googleusercontent.com"
-         data-callback="handleCredentialResponse">
-    </div>
-
-    <div class="g_id_signin"
-         data-type="standard"
-         data-size="large"
-         data-theme="outline"
-         data-text="sign_in_with"
-         data-shape="rectangular"
-         data-logo_alignment="left">
-    </div>
-
-    <!-- Result box -->
-    <div id="result" class="result"></div>
-
-    <!-- Hidden form area -->
-    <div id="formArea">
-      <h3>Request Form</h3>
-
-      <div class="field">
-        <label for="center">報單中心編號 / Center Code</label>
-        <input type="text" id="center" placeholder="例如 C001">
+  <div class="wrapper">
+    <div class="card">
+      <div class="header">
+        <div class="badge">Member Number Assignment</div>
+        <h1>會員號碼申請系統</h1>
+        <div class="subtitle">
+          請使用已授權的 Google 帳戶登入，然後提交會員號碼申請。<br>
+          Please sign in with your authorized Google account and submit your member number request.
+        </div>
       </div>
 
-      <div class="field">
-        <label for="personName">負責人姓名 / Person in Charge</label>
-        <input type="text" id="personName" placeholder="請輸入姓名">
-      </div>
+      <div class="content">
+        <div class="login-area">
+          <div id="g_id_onload"
+               data-client_id="663272088961-8khaah34cj9bsvesuing05a84djeorh0.apps.googleusercontent.com"
+               data-callback="handleCredentialResponse">
+          </div>
 
-      <div class="field">
-        <label for="qty">申請數量 / Quantity</label>
-        <input type="number" id="qty" min="1" value="1">
-      </div>
+          <div class="g_id_signin"
+               data-type="standard"
+               data-size="large"
+               data-theme="outline"
+               data-text="sign_in_with"
+               data-shape="rectangular"
+               data-logo_alignment="left">
+          </div>
+        </div>
 
-      <button id="submitBtn" onclick="submitRequest()">提交申請 / Submit</button>
+        <div id="statusBox" class="status-box"></div>
+        <div id="result" class="result-card"></div>
+
+        <div id="formArea" class="form-card">
+          <div class="form-title">申請資料 / Request Details</div>
+          <div class="form-subtitle">
+            請填寫以下資料以獲取新的會員號碼。<br>
+            Please complete the details below to obtain new member number(s).
+          </div>
+
+          <div class="field">
+            <label for="center">
+              <div class="label-cn">報單中心編號</div>
+              <div class="label-en">Center Code</div>
+            </label>
+            <input type="text" id="center" placeholder="例如 / e.g. FN001">
+          </div>
+
+          <div class="field">
+            <label for="personName">
+              <div class="label-cn">負責人姓名</div>
+              <div class="label-en">Person in Charge</div>
+            </label>
+            <input type="text" id="personName" placeholder="請輸入姓名 / Enter name">
+          </div>
+
+          <div class="field">
+            <label for="qty">
+              <div class="label-cn">申請數量</div>
+              <div class="label-en">Quantity Requested</div>
+            </label>
+            <input type="number" id="qty" min="1" max="20" value="1">
+            <div class="hint">
+              每次最多可申請 20 個會員號碼。<br>
+              Maximum 20 member numbers per request.
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button id="submitBtn" class="primary-btn" onclick="submitRequest()">提交申請 / Submit</button>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          為保障資料保密，系統只會顯示本次申請結果，不會公開其他已分配號碼。<br>
+          For confidentiality, the system only shows the result of the current request and does not disclose other assigned numbers.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -144,6 +378,42 @@
     const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwsQq96WMhIV3Kh0nXMBZmugD51SOn5N0aUfc1KjKQ_E8SkalbR7ZRTBm1sS8rCV58zWw/exec';
 
     let signedInEmail = '';
+
+    function showStatus(message, type) {
+      const box = document.getElementById('statusBox');
+      box.style.display = 'block';
+      box.className = 'status-box';
+
+      if (type === 'loading') box.classList.add('status-loading');
+      if (type === 'error') box.classList.add('status-error');
+      if (type === 'success') box.classList.add('status-success');
+
+      box.innerHTML = message;
+    }
+
+    function showResult(title, message, type, numbers = [], qty = '') {
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result-card';
+
+      if (type === 'loading') resultDiv.classList.add('result-loading');
+      if (type === 'error') resultDiv.classList.add('result-error');
+      if (type === 'success') resultDiv.classList.add('result-success');
+
+      let html =
+        '<div class="result-title">' + title + '</div>' +
+        '<div class="result-meta">' + message + '</div>';
+
+      if (numbers.length > 0) {
+        html += '<div class="number-list">';
+        numbers.forEach(function(no) {
+          html += '<div class="number-item">' + no + '</div>';
+        });
+        html += '</div>';
+      }
+
+      resultDiv.innerHTML = html;
+    }
 
     function decodeJwtResponse(token) {
       const base64Url = token.split('.')[1];
@@ -157,25 +427,36 @@
     }
 
     function handleCredentialResponse(response) {
-      const resultDiv = document.getElementById('result');
-
       try {
         const userObject = decodeJwtResponse(response.credential);
         const email = (userObject.email || '').toLowerCase();
         signedInEmail = email;
 
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'result loading';
-        resultDiv.innerHTML =
-          '<strong>Checking approval...</strong><br>Email: ' + email;
+        showStatus(
+          '正在驗證登入帳戶：<strong>' + email + '</strong><br>' +
+          'Verifying signed-in account: <strong>' + email + '</strong>',
+          'loading'
+        );
+
+        showResult(
+          '系統處理中 / Processing',
+          '正在檢查你的帳戶是否已獲授權。<br>Checking whether your account is authorized.',
+          'loading'
+        );
 
         checkApproval(email);
 
       } catch (e) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'result error';
-        resultDiv.innerHTML =
-          '<strong>Error decoding login response</strong><br>' + e.message;
+        showStatus(
+          '登入資料解析失敗。<br>Failed to decode sign-in response.',
+          'error'
+        );
+
+        showResult(
+          '系統發生錯誤 / Error',
+          e.message,
+          'error'
+        );
       }
     }
 
@@ -183,23 +464,34 @@
       const callbackName = 'approvalCallback_' + Date.now();
 
       window[callbackName] = function(res) {
-        const resultDiv = document.getElementById('result');
         const formArea = document.getElementById('formArea');
 
         if (res.success && res.approved) {
-          resultDiv.className = 'result';
-          resultDiv.innerHTML =
-            '<strong>Access granted</strong><br>' +
-            'Email: ' + res.email + '<br>' +
-            'Status: Approved';
+          showStatus(
+            '已識別登入帳戶：<strong>' + res.email + '</strong><br>' +
+            'Signed-in account detected and approved.',
+            'success'
+          );
+
+          showResult(
+            '已獲授權 / Access Granted',
+            '你可以提交會員號碼申請。<br>You may now submit your member number request.',
+            'success'
+          );
 
           formArea.style.display = 'block';
         } else {
-          resultDiv.className = 'result error';
-          resultDiv.innerHTML =
-            '<strong>Access denied</strong><br>' +
-            'Email: ' + (res.email || email) + '<br>' +
-            'Status: ' + (res.message || 'Not authorized');
+          showStatus(
+            '此 Google 帳戶未獲授權：<strong>' + (res.email || email) + '</strong><br>' +
+            'This Google account is not authorized.',
+            'error'
+          );
+
+          showResult(
+            '未獲授權 / Access Denied',
+            '此帳戶未被列入核准名單，請聯絡管理員。<br>This account is not on the approved user list. Please contact the administrator.',
+            'error'
+          );
 
           formArea.style.display = 'none';
         }
@@ -215,73 +507,81 @@
         + '&callback=' + callbackName;
 
       script.onerror = function() {
-        const resultDiv = document.getElementById('result');
-        resultDiv.className = 'result error';
-        resultDiv.innerHTML =
-          '<strong>Error</strong><br>Unable to connect to backend.';
+        showStatus(
+          '未能連接後端系統。<br>Unable to connect to backend system.',
+          'error'
+        );
+
+        showResult(
+          '連線錯誤 / Connection Error',
+          '未能連接後端系統，請稍後再試。<br>Unable to connect to backend. Please try again later.',
+          'error'
+        );
       };
 
       document.body.appendChild(script);
     }
 
     function submitRequest() {
-      const resultDiv = document.getElementById('result');
       const center = document.getElementById('center').value.trim();
       const personName = document.getElementById('personName').value.trim();
       const qty = document.getElementById('qty').value;
       const submitBtn = document.getElementById('submitBtn');
 
       if (!signedInEmail) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'result error';
-        resultDiv.innerHTML = '<strong>Error</strong><br>No signed-in email found.';
+        showResult(
+          '系統發生錯誤 / Error',
+          '找不到登入帳戶資料。<br>No signed-in account found.',
+          'error'
+        );
         return;
       }
 
       if (!center) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'result error';
-        resultDiv.innerHTML = '<strong>Error</strong><br>Please enter Center Code.';
+        showResult(
+          '資料不完整 / Missing Information',
+          '請輸入報單中心編號。<br>Please enter Center Code.',
+          'error'
+        );
         return;
       }
 
       if (!personName) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'result error';
-        resultDiv.innerHTML = '<strong>Error</strong><br>Please enter Person in Charge.';
+        showResult(
+          '資料不完整 / Missing Information',
+          '請輸入負責人姓名。<br>Please enter Person in Charge.',
+          'error'
+        );
         return;
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
+      submitBtn.textContent = '提交中... / Submitting...';
 
-      resultDiv.style.display = 'block';
-      resultDiv.className = 'result loading';
-      resultDiv.innerHTML =
-        '<strong>Processing request...</strong><br>Please wait.';
+      showResult(
+        '系統處理中 / Processing',
+        '請稍候，系統正在分配會員號碼。<br>Please wait while the system assigns member number(s).',
+        'loading'
+      );
 
       const callbackName = 'assignCallback_' + Date.now();
 
       window[callbackName] = function(res) {
         if (res.success) {
-          let html =
-            '<strong>Assigned successfully</strong><br>' +
-            'Email: ' + signedInEmail + '<br>' +
-            'Quantity: ' + res.qty + '<br>' +
-            '<div class="numbers"><strong>Member Numbers:</strong><ul>';
-
-          res.numbers.forEach(function(no) {
-            html += '<li>' + no + '</li>';
-          });
-
-          html += '</ul></div>';
-
-          resultDiv.className = 'result';
-          resultDiv.innerHTML = html;
+          showResult(
+            '申請成功 / Request Successful',
+            '使用帳戶 / Account Used：<strong>' + signedInEmail + '</strong><br>' +
+            '成功分配數量 / Quantity Assigned：<strong>' + res.qty + '</strong>',
+            'success',
+            res.numbers,
+            res.qty
+          );
         } else {
-          resultDiv.className = 'result error';
-          resultDiv.innerHTML =
-            '<strong>Error</strong><br>' + res.message;
+          showResult(
+            '申請未能完成 / Request Not Completed',
+            res.message,
+            'error'
+          );
         }
 
         submitBtn.disabled = false;
@@ -301,9 +601,11 @@
         + '&callback=' + callbackName;
 
       script.onerror = function() {
-        resultDiv.className = 'result error';
-        resultDiv.innerHTML =
-          '<strong>Error</strong><br>Unable to connect to backend.';
+        showResult(
+          '連線錯誤 / Connection Error',
+          '未能連接後端系統，請稍後再試。<br>Unable to connect to backend. Please try again later.',
+          'error'
+        );
         submitBtn.disabled = false;
         submitBtn.textContent = '提交申請 / Submit';
       };
