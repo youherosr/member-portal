@@ -443,7 +443,7 @@
 
           <div class="button-row">
             <button id="submitBtn" class="primary-btn" onclick="submitRequest()">提交申請 / Submit</button>
-            <button id="copyBtn" class="secondary-btn" onclick="copyNumbers()">複製號碼 / Copy Numbers</button>
+            <button id="copyBtn" class="secondary-btn" onclick="copyNumbers()">複製 Excel 格式 / Copy for Excel</button>
             <button id="clearBtn" class="ghost-btn" onclick="clearForm()">清除表格 / Clear Form</button>
             <button id="switchBtn" class="ghost-btn" onclick="toggleSwitchHelp()">切換帳戶 / Switch Account</button>
           </div>
@@ -699,18 +699,22 @@
     }
 
     function copyNumbers() {
-      if (!latestAssignedNumbers.length) return;
+     if (!latestAssignedNumbers.length) return;
 
-      const text = latestAssignedNumbers.join(', ');
-      navigator.clipboard.writeText(text).then(function() {
-        const btn = document.getElementById('copyBtn');
-        const originalText = btn.textContent;
-        btn.textContent = '已複製 / Copied';
-        setTimeout(function() {
-          btn.textContent = originalText;
-        }, 1500);
-      });
-    }
+  // Excel-friendly format (vertical)
+  const text = latestAssignedNumbers.join('\n');
+
+  navigator.clipboard.writeText(text).then(function() {
+    const btn = document.getElementById('copyBtn');
+    const originalText = btn.textContent;
+
+    btn.textContent = '已複製 Excel 格式 / Copied for Excel';
+
+    setTimeout(function() {
+      btn.textContent = originalText;
+    }, 1500);
+  });
+}
 
     function clearForm() {
       document.getElementById('center').value = '';
