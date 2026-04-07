@@ -516,10 +516,25 @@
       return JSON.parse(jsonPayload);
     }
 
+    function resetUiForNewSession() {
+      latestAssignedNumbers = [];
+      document.getElementById('copyBtn').style.display = 'none';
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('switchHelp').style.display = 'none';
+      document.getElementById('formArea').style.display = 'none';
+    }
+
     function handleCredentialResponse(response) {
       try {
+        resetUiForNewSession();
+
         const userObject = decodeJwtResponse(response.credential);
-        const email = (userObject.email || '').toLowerCase();
+        const email = String(userObject.email || '').trim().toLowerCase();
+
+        if (!email) {
+          throw new Error('No email found in Google sign-in response.');
+        }
+
         signedInEmail = email;
 
         document.getElementById('accountPanel').style.display = 'block';
@@ -536,11 +551,12 @@
 
       } catch (e) {
         showStatus(
-          '登入資料解析失敗。<br>Failed to decode sign-in response.',
+          '登入資料解析失敗。請重新整理頁面後再試。<br>Failed to decode sign-in response. Please refresh the page and try again.',
           'error'
         );
 
         document.getElementById('formArea').style.display = 'none';
+
         showResult(
           '系統發生錯誤 / Error',
           e.message,
@@ -550,47 +566,58 @@
     }
 
     function checkApproval(email) {
-      const callbackName = 'approvalCallback_' + Date.now();
+      const callbackName = 'approvalCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
 
       window[callbackName] = function(res) {
         const formArea = document.getElementById('formArea');
 
-        if (res.success && res.approved) {
-          showStatus(
-            '已識別並驗證登入帳戶：<strong>' + res.email + '</strong><br>' +
-            'Signed-in account verified and approved.',
-            'success'
-          );
+        try {
+          if (res && res.success && res.approved) {
+            showStatus(
+              '已識別並驗證登入帳戶：<strong>' + (res.email || email) + '</strong><br>' +
+              'Signed-in account verified and approved.',
+              'success'
+            );
 
-          formArea.style.display = 'block';
-          document.getElementById('result').style.display = 'none';
-        } else {
-          showStatus(
-            '此 Google 帳戶未獲授權：<strong>' + (res.email || email) + '</strong><br>' +
-            'This Google account is not authorized.',
-            'error'
-          );
+            formArea.style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+          } else {
+            showStatus(
+              '此 Google 帳戶未獲授權：<strong>' + ((res && res.email) || email) + '</strong><br>' +
+              'This Google account is not authorized.',
+              'error'
+            );
 
-          formArea.style.display = 'none';
+            formArea.style.display = 'none';
+          }
+        } finally {
+          delete window[callbackName];
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
         }
-
-        delete window[callbackName];
-        script.remove();
       };
 
       const script = document.createElement('script');
       script.src = BACKEND_URL
         + '?action=checkUser'
         + '&email=' + encodeURIComponent(email)
-        + '&callback=' + callbackName;
+        + '&callback=' + encodeURIComponent(callbackName)
+        + '&t=' + Date.now();
 
       script.onerror = function() {
         showStatus(
-          '未能連接後端系統。<br>Unable to connect to backend system.',
+          '未能連接後端系統，可能是登入狀態過期或快取問題。請重新整理頁面，或使用無痕視窗再試。<br>' +
+          'Unable to connect to backend system. This may be caused by an expired session or browser cache. Please refresh the page or try again in an incognito/private window.',
           'error'
         );
 
         document.getElementById('formArea').style.display = 'none';
+
+        delete window[callbackName];
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
       };
 
       document.body.appendChild(script);
@@ -609,7 +636,7 @@
       if (!signedInEmail) {
         showResult(
           '系統發生錯誤 / Error',
-          '找不到登入帳戶資料。<br>No signed-in account found.',
+          '找不到登入帳戶資料。請重新整理頁面並重新登入。<br>No signed-in account found. Please refresh the page and sign in again.',
           'error'
         );
         return;
@@ -642,38 +669,45 @@
         'loading'
       );
 
-      const callbackName = 'assignCallback_' + Date.now();
+      const callbackName = 'assignCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
 
       window[callbackName] = function(res) {
-        if (res.success) {
-          latestAssignedNumbers = res.numbers || [];
+        try {
+          if (res && res.success) {
+            latestAssignedNumbers = Array.isArray(res.numbers) ? res.numbers : [];
 
-          showResult(
-            '申請成功 / Request Successful',
-            '使用帳戶 / Account Used：<strong>' + signedInEmail + '</strong><br>' +
-            '成功分配數量 / Quantity Assigned：<strong>' + res.qty + '</strong><br>' +
-            '系統亦會向你的 Gmail 發送確認電郵。<br>A confirmation email will also be sent to your Gmail.',
-            'success',
-            latestAssignedNumbers
-          );
+            showResult(
+              '申請成功 / Request Successful',
+              '使用帳戶 / Account Used：<strong>' + signedInEmail + '</strong><br>' +
+              '成功分配數量 / Quantity Assigned：<strong>' + res.qty + '</strong><br>' +
+              '請使用下方「複製 Excel 格式」按鈕貼上到 Excel。<br>' +
+              'Please use the "Copy for Excel" button below to paste into Excel.<br>' +
+              '系統亦會向你的 Gmail 發送確認電郵。<br>' +
+              'A confirmation email will also be sent to your Gmail.',
+              'success',
+              latestAssignedNumbers
+            );
 
-          if (latestAssignedNumbers.length > 0) {
-            copyBtn.style.display = 'inline-block';
+            if (latestAssignedNumbers.length > 0) {
+              copyBtn.style.display = 'inline-block';
+            }
+          } else {
+            showResult(
+              '申請未能完成 / Request Not Completed',
+              (res && res.message) || 'Unknown error',
+              'error'
+            );
           }
-        } else {
-          showResult(
-            '申請未能完成 / Request Not Completed',
-            res.message,
-            'error'
-          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '提交申請 / Submit';
+          document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+          delete window[callbackName];
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
         }
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = '提交申請 / Submit';
-        document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-        delete window[callbackName];
-        script.remove();
       };
 
       const script = document.createElement('script');
@@ -683,38 +717,49 @@
         + '&center=' + encodeURIComponent(center)
         + '&name=' + encodeURIComponent(personName)
         + '&qty=' + encodeURIComponent(qty)
-        + '&callback=' + callbackName;
+        + '&callback=' + encodeURIComponent(callbackName)
+        + '&t=' + Date.now();
 
       script.onerror = function() {
         showResult(
           '連線錯誤 / Connection Error',
-          '未能連接後端系統，請稍後再試。<br>Unable to connect to backend. Please try again later.',
+          '未能連接後端系統，可能是登入狀態過期或瀏覽器快取所致。請重新整理後再試。<br>Unable to connect to backend. This may be caused by an expired session or browser cache. Please refresh the page and try again.',
           'error'
         );
         submitBtn.disabled = false;
         submitBtn.textContent = '提交申請 / Submit';
+
+        delete window[callbackName];
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
       };
 
       document.body.appendChild(script);
     }
 
     function copyNumbers() {
-     if (!latestAssignedNumbers.length) return;
+      if (!latestAssignedNumbers.length) return;
 
-  // Excel-friendly format (vertical)
-  const text = latestAssignedNumbers.join('\n');
+      const text = latestAssignedNumbers.join('\n');
 
-  navigator.clipboard.writeText(text).then(function() {
-    const btn = document.getElementById('copyBtn');
-    const originalText = btn.textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        const btn = document.getElementById('copyBtn');
+        const originalText = btn.textContent;
 
-    btn.textContent = '已複製 Excel 格式 / Copied for Excel';
+        btn.textContent = '已複製 Excel 格式 / Copied for Excel';
 
-    setTimeout(function() {
-      btn.textContent = originalText;
-    }, 1500);
-  });
-}
+        setTimeout(function() {
+          btn.textContent = originalText;
+        }, 1500);
+      }).catch(function() {
+        showResult(
+          '複製失敗 / Copy Failed',
+          '未能自動複製號碼，請稍後再試。<br>Unable to copy automatically. Please try again.',
+          'error'
+        );
+      });
+    }
 
     function clearForm() {
       document.getElementById('center').value = '';
